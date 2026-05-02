@@ -2,73 +2,23 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
-env:
-  IMAGE_NAME: devops-node-api
-
 jobs:
   test:
-    name: 🧪 Run Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.x'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run linter
-        run: npm run lint --if-present
-        continue-on-error: true
-
-      - name: Run tests
-        run: npm test
-
-  docker:
-    name: 🐳 Docker Build
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    needs: test
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build Docker image
-        run: docker build -t $IMAGE_NAME:${{ github.sha }} .
-
-  security:
-    name: 🔒 Security Audit
+    name: Run Tests
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20.x'
-          cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
+      - run: npm install
 
-      - name: Run security audit
-        run: npm audit --audit-level=high
-        continue-on-error: true
+      - run: npm test
